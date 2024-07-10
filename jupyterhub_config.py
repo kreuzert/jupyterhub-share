@@ -23,7 +23,7 @@ c.SimpleLocalProcessSpawner.options_form = """
           <input type="number" name="runtime-input" value="30" min="10" max="1440" required="required">
           <input type="range" name="range1" min="0" max="100" value="90" step="10" />
       """
-c.SimpleLocalProcessSpawner.default_url = "/hub/home"
+c.JupyterHub.default_url = "/hub/home"
 
 import os
 c.JupyterHub.template_paths = os.path.join(os.path.dirname(jupyterhub_share.__file__), "share", "templates")
