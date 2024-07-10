@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["jupyterhub_share"]
-include = ["*.py"]
+include = ["*.py", "*.html"]
 exclude = ["test*"]
 
 [project]

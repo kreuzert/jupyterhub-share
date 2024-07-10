@@ -15,7 +15,7 @@ class UserOptionsShares(Base):
     __tablename__ = "useroptions_shares"
     id = Column(Integer, primary_key=True, autoincrement=True)
     share_id = Column(Unicode(255), unique=True)
-    user_options = Column(JSONDictCache, default={}, cache_ok=True)
+    user_options = Column(JSONDictCache, default={})
 
     def __repr__(self):
         return f"<{self.__class__.__name__} {self.share_id}: {self.user_options}>"

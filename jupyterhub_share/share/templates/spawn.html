@@ -72,9 +72,11 @@ $('#sharebutton').bind('click', function(event) {
     {%- else %}
     // SpawnHandler was used to render this template
     var pathname = window.location.pathname;
-    var username_servername = pathname.split("/hub/spawn/").pop();
-    if ( username_servername.includes("/") ) {
-      server_name = username_servername.split("/").pop();
+    if ( ! (pathname.endsWith("/hub/spawn")) ) {
+      var username_servername = pathname.split("/hub/spawn/").pop();
+      if ( username_servername.includes("/") ) {
+        server_name = username_servername.split("/").pop();
+      }
     }
     {%- endif %}
     console.log(server_name);

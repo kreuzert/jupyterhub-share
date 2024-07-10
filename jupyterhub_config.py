@@ -26,8 +26,6 @@ c.SimpleLocalProcessSpawner.options_form = """
 c.SimpleLocalProcessSpawner.default_url = "/hub/home"
 
 import os
-
-s = os.getcwd()
-c.JupyterHub.template_paths = os.path.join(s, "share", "templates")
+c.JupyterHub.template_paths = os.path.join(os.path.dirname(jupyterhub_share.__file__), "share", "templates")
 
 c.JupyterHub.allow_named_servers = True
