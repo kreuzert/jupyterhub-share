@@ -1,0 +1,146 @@
+{% extends "page.html" %}
+{% if announcement_spawn is string %}
+  {% set announcement = announcement_spawn %}
+{% endif %}
+
+{% block main %}
+
+<div class="container">
+  {% block heading %}
+  <div class="row text-center">
+    <h1>
+    Server Options
+    <svg style="cursor: pointer;" fill="#000000" id="sharebutton" height="16" width="16" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+      viewBox="0 0 458.624 458.624" xml:space="preserve">
+      <g>
+        <g>
+          <path d="M339.588,314.529c-14.215,0-27.456,4.133-38.621,11.239l-112.682-78.67c1.809-6.315,2.798-12.976,2.798-19.871
+            c0-6.896-0.989-13.557-2.798-19.871l109.64-76.547c11.764,8.356,26.133,13.286,41.662,13.286c39.79,0,72.047-32.257,72.047-72.047
+            C411.634,32.258,379.378,0,339.588,0c-39.79,0-72.047,32.257-72.047,72.047c0,5.255,0.578,10.373,1.646,15.308l-112.424,78.491
+            c-10.974-6.759-23.892-10.666-37.727-10.666c-39.79,0-72.047,32.257-72.047,72.047s32.256,72.047,72.047,72.047
+            c13.834,0,26.753-3.907,37.727-10.666l113.292,79.097c-1.629,6.017-2.514,12.34-2.514,18.872c0,39.79,32.257,72.047,72.047,72.047
+            c39.79,0,72.047-32.257,72.047-72.047C411.635,346.787,379.378,314.529,339.588,314.529z"/>
+        </g>
+      </g>
+    </svg>
+    </h1>
+  </div>
+  {% endblock %}
+  <div class="row col-sm-offset-2 col-sm-8">
+    {% if for_user and user.name != for_user.name -%}
+      <p>Spawning server for {{ for_user.name }}</p>
+    {% endif -%}
+    {% if error_message -%}
+      <p class="spawn-error-msg text-danger">
+        Error: {{error_message}}
+      </p>
+    {% endif %}
+      <p hidden=true id="share_information" class="spawn-error-msg text-danger"></p>
+    <form enctype="multipart/form-data" id="spawn_form" action="{{ url | safe }}" method="post" role="form">
+      {{spawner_options_form | safe}}
+      <br>
+      <div class="feedback-container">
+        <input type="submit" value="Start" class="btn btn-jupyter form-control">
+        <div class="feedback-widget hidden">
+          <i class="fa fa-spinner"></i>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+{{ super() }}
+<script>
+$('#sharebutton').bind('click', function(event) {
+  require(["jquery", "jhapi", "utils"], function ($, JHAPI, utils) {
+    var base_url = window.jhdata.base_url;
+    var user = window.jhdata.user;
+    var api = new JHAPI(base_url);
+    var array_arguments = $('#spawn_form').serializeArray();
+    $('#spawn_form input[type="checkbox"]:not(:checked)').each(function(i, e) {
+      array_arguments.push({name: e.getAttribute("name"), value: "false"});
+  });
+    var options = { type: "POST", data: JSON.stringify(array_arguments), dataType: null, success: function (resp) {
+      const url = utils.url_path_join(window.origin, base_url, "share", "user_options", resp).replace("//", "/")
+      alert("You can share the selected options with this url:\n" + url);
+    }};
+    api.api_request(
+      utils.url_path_join("share", "user_options"),
+      options
+    );
+    event.preventDefault();    
+  });
+});
+
+// setup onSubmit feedback
+$('form').submit((e) => {
+  var form = $(e.target);
+  form.find('.feedback-container>input').attr('disabled', true);
+  form.find('.feedback-container>*').toggleClass('hidden');
+  form.find('.feedback-widget>*').toggleClass('fa-pulse');
+});
+
+$(document).ready(function() {
+  require(["jquery"], function($){
+    var form = $('#spawn_form');
+    var unavailable_options = [];
+    {%- if spawner_options_form_values %}
+    var spawner_options_form_values = {{spawner_options_form_values | safe}};
+    {%- else %}
+    var spawner_options_form_values = false;
+    {%- endif %}
+    var unknown_options = [];
+    if (spawner_options_form_values) {
+      spawner_options_form_values.forEach((json_dict) => {
+        var element = form.find('*[name="' + json_dict.name + '"]');
+        if (element.length > 0) {
+          switch (element[0].type) {
+            case 'text':
+            case 'number':
+              element[0].value = json_dict.value;
+              break;
+            case 'checkbox':
+            case 'radio':
+              element[0].checked = json_dict.value === 'true';
+              break;
+            case 'select-one':
+            case 'select-multiple':
+              if ( [...element[0].options].map(o => o.value).includes(json_dict.value) ){
+                element[0].value = json_dict.value;
+              } else {
+                unknown_options.push([json_dict.name, json_dict.value]);
+              }
+              break;
+            case 'range':
+              if ( parseInt(json_dict.value) >= parseInt(element[0].min) && parseInt(json_dict.value) <= parseInt(element[0].max) ){
+                element[0].value = json_dict.value;
+              } else {
+                unknown_options.push([json_dict.name, json_dict.value]);
+              }
+              break;
+            case 'date':
+              console.log("Date (" + json_dict.name + ") not yet supported.");
+              break;
+            default:
+              console.log(element[0].type + " (" +json_dict+ ")not supported yet");
+          }
+        } else {
+          unknown_options.push([json_dict.name, json_dict.value]);
+        }
+      });
+    }
+    if (unknown_options.length > 0) {
+      var msg = "The share link may not work as expected. The following options cannot be defined:"
+      unknown_options.forEach((x) => {
+        msg = msg + "<br>" + x[0] + "=" + x[1]
+      });
+      document.getElementById("share_information").innerHTML = msg;
+      document.getElementById("share_information").hidden = false;
+    }
+  });
+});
+</script>
+{% endblock %}
