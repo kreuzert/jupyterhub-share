@@ -8,7 +8,7 @@ include = ["*.py"]
 exclude = ["test*"]
 
 [project]
-name = "jupyterhub_share"
+name = "jupyterhub-share"
 description = "JupyterHub Share feature. Enables to easily share chosen UserOptions."
 readme = "README.md"
 version = "0.1.0"

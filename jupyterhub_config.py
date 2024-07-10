@@ -29,3 +29,5 @@ import os
 
 s = os.getcwd()
 c.JupyterHub.template_paths = os.path.join(s, "share", "templates")
+
+c.JupyterHub.allow_named_servers = True

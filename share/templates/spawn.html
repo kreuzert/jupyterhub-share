@@ -57,14 +57,33 @@
 $('#sharebutton').bind('click', function(event) {
   require(["jquery", "jhapi", "utils"], function ($, JHAPI, utils) {
     var base_url = window.jhdata.base_url;
-    var user = window.jhdata.user;
+    {%- if for_user and user.name != for_user.name -%}
+    var user_name = {{ for_user.name }}
+    {%- else %}
+    var user_name = window.jhdata.user.name;
+    {%- endif %}
     var api = new JHAPI(base_url);
+    var server_name = "";
+    {%- if server_name is defined %}
+    // SharedUserOptionsHandler was used to render this template
+    {%- if server_name | length %}
+    server_name = "{{ server_name }}";
+    {%- endif %}
+    {%- else %}
+    // SpawnHandler was used to render this template
+    var pathname = window.location.pathname;
+    var username_servername = pathname.split("/hub/spawn/").pop();
+    if ( username_servername.includes("/") ) {
+      server_name = username_servername.split("/").pop();
+    }
+    {%- endif %}
+    console.log(server_name);
     var array_arguments = $('#spawn_form').serializeArray();
     $('#spawn_form input[type="checkbox"]:not(:checked)').each(function(i, e) {
       array_arguments.push({name: e.getAttribute("name"), value: "false"});
-  });
+    });
     var options = { type: "POST", data: JSON.stringify(array_arguments), dataType: null, success: function (resp) {
-      const url = utils.url_path_join(window.origin, base_url, "share", "user_options", resp).replace("//", "/")
+      const url = utils.url_path_join(window.origin, base_url, "share", "user_options", resp, server_name).replace("//", "/")
       alert("You can share the selected options with this url:\n" + url);
     }};
     api.api_request(
