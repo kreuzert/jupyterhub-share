@@ -3,7 +3,7 @@ This small package allows users to share their chosen `user_options` with others
 In combination with the right `options_form`, it can lead to FAIR digital objects in your JupyterHub installation.
 
 ## Installation
-`pip install juypterhub-share`
+`pip install jupyterhub-share`
 
 ## Configuration
 In the `jupyterhub_config.py` file one have to add `import jupyterhub_share`.  
