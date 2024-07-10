@@ -11,3 +11,5 @@ Furthermore, the new `spawn.html` template file must be used.
 
 ## Usage
 Users may select the `user_options` as they're used to. Before clicking on "Start", one can click on the share icon next to "Server Options". This will generate a unique URL. If any user opens this link, they'll redirected to the spawn page with the previously selected `user_options`.
+
+![Screenshot](./screenshot.jpg "Screenshot")
