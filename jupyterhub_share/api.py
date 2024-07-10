@@ -16,7 +16,6 @@ class ShareUserOptionsAPIHandler(APIHandler):
     @needs_scope("servers")
     async def post(self):
         data = self.get_json_body()
-        self.log.info(data)
         db_entry = UserOptionsShares.find(self.db, user_options=data)
         if db_entry is None:
             secret = secrets.token_urlsafe(8)
@@ -25,7 +24,6 @@ class ShareUserOptionsAPIHandler(APIHandler):
             self.db.commit()
         else:
             secret = db_entry.share_id
-        self.log.info(secret)
         self.set_status(200)
         self.set_header("Content-Type", "text/plain")
         self.write(secret)
