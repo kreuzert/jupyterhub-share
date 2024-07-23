@@ -23,4 +23,5 @@ class ShareUserOptionsAPIHandler(APIHandler):
         self.set_header("Content-Type", "text/plain")
         self.write(share_id)
 
+
 default_handlers.append((r"/api/share/user_options", ShareUserOptionsAPIHandler))

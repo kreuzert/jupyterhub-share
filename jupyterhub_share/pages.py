@@ -8,6 +8,7 @@ from tornado.httputil import url_concat
 
 from .orm import UserOptionsShares
 
+
 class ShareUserOptionsSpawnHandler(SpawnHandler):
     async def _render_form(
         self,
@@ -58,6 +59,7 @@ class ShareUserOptionsSpawnHandler(SpawnHandler):
             message=message,
         )
         self.finish(form)
+
 
 default_handlers.append((r"/share/user_options/([^/]+)", ShareUserOptionsSpawnHandler))
 default_handlers.append(
